@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "piofe-unrolling"
+version = "0.1.0"
+description = ""
+authors = ["bkr11a <bkr11a@hotmail.com>"]
+readme = "README.md"
+packages = [{include = "piofe_unrolling", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+python-dotenv = "^1.0.1"
+numpy = "^2.0.0"
+scipy = "^1.14.0"
+tqdm = "^4.66.4"
+matplotlib = "^3.9.0"
+scikit-learn = "^1.5.0"
+pandas = "^2.2.2"
+openpyxl = "^3.1.4"
+loguru = "^0.7.2"
+
+
+[tool.poetry.group.eda.dependencies]
+jupyterlab = "^4.2.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
