@@ -1,0 +1,115 @@
+\documentclass[conference, a4paper]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{scalerel}
+
+\usetikzlibrary{shapes.multipart, positioning, fit, shapes.geometric, svg.path}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\definecolor{orcidlogocol}{HTML}{A6CE39}
+\tikzset{
+	orcidlogo/.pic={
+		\fill[orcidlogocol] svg{M256,128c0,70.7-57.3,128-128,128C57.3,256,0,198.7,0,128C0,57.3,57.3,0,128,0C198.7,0,256,57.3,256,128z};
+		\fill[white] svg{M86.3,186.2H70.9V79.1h15.4v48.4V186.2z}
+		svg{M108.9,79.1h41.6c39.6,0,57,28.3,57,53.6c0,27.5-21.5,53.6-56.8,53.6h-41.8V79.1z M124.3,172.4h24.5c34.9,0,42.9-26.5,42.9-39.7c0-21.5-13.7-39.7-43.7-39.7h-23.7V172.4z}
+		svg{M88.7,56.8c0,5.5-4.5,10.1-10.1,10.1c-5.6,0-10.1-4.6-10.1-10.1c0-5.6,4.5-10.1,10.1-10.1C84.2,46.7,88.7,51.3,88.7,56.8z};
+	}
+}
+
+\newcommand\orcidicon[1]{\href{https://orcid.org/#1}{\mbox{\scalerel*{
+				\begin{tikzpicture}[yscale=-1,transform shape]
+					\pic{orcidlogo};
+				\end{tikzpicture}
+			}{|}}}}
+
+\newtheorem{theorem}{Theorem}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\prox}{\mathrm{prox}}
+\DeclareMathOperator*{\sign}{\mathrm{sign}}
+
+\usepackage{hyperref} %<--- Load after everything else
+
+\begin{document}
+
+% Perhaps this could also be Physics-Informed learning of the Optical Flow Operator (if we are going to be using the deep o net)
+\title{Physics-Informed Optical Flow Estimation via Algorithm Unrolling\\
+{}
+\thanks{B. K. Rice is with the School of Computing and Information Technology, University of Wollongong, Australia.}% <-this % stops a space
+\thanks{P. O. Ogunbona is with the School of Computing and Information Technology, University of Wollongong, Australia.}
+\thanks{Manuscript received (put the relevant date here date); revised \today.}
+}
+
+\author{\IEEEauthorblockN{Brad K. Rice \orcidicon{0000-0003-1612-4975}}
+\IEEEauthorblockA{\textit{Advanced Multimedia Research Laboratory} \\
+\textit{University of Wollongong}\\
+Wollongong, Australia }
+\and
+\IEEEauthorblockN{Philip O. Ogunbona \orcidicon{0000-0003-4119-2873}}
+\IEEEauthorblockA{\textit{Advanced Multimedia Research Laboratory} \\
+\textit{University of Wollongong}\\
+Wollongong, Australia }
+}
+
+\maketitle
+
+\input{sections/abstract.tex}
+\input{sections/introduction.tex}
+\input{sections/preliminaries.tex}
+\input{sections/related_work.tex}
+\input{sections/methods.tex}
+\input{sections/experiment_design.tex}
+\input{sections/results.tex}
+\input{sections/discussion.tex}
+\input{sections/conclusion.tex}
+% If required we can include the future work.
+\input{sections/future_work.tex}
+
+\section*{Acknowledgment}
+
+The preferred spelling of the word ``acknowledgment'' in America is without 
+an ``e'' after the ``g''. Avoid the stilted expression ``one of us (R. B. 
+G.) thanks $\ldots$''. Instead, try ``R. B. G. thanks$\ldots$''. Put sponsor 
+acknowledgments in the unnumbered footnote on the first page.
+
+\bibliographystyle{IEEEtran}
+\bibliography{phys}
+
+\section{Biography Section}
+%If you have an EPS/PDF photo (graphicx package needed), extra braces are
+% needed around the contents of the optional argument to biography to prevent
+% the LaTeX parser from getting confused when it sees the complicated
+% $\backslash${\tt{includegraphics}} command within an optional argument. (You can create
+% your own custom macro containing the $\backslash${\tt{includegraphics}} command to make things
+% simpler here.)
+
+% \vspace{11pt}
+
+% \bf{If you include a photo:}\vspace{-33pt}
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{authorImages/IMG_2976.JPG}}]{Brad Rice}
+	is a doctoral candidate in the School of Computing and Information Technology at the University of Wollongong, Australia. His work focuses on '\textit{Physics Inspired Deep Neural Networks for Computer Vision}'. Physics-informed learning has a broad applicability across various domains and allow for an amalgamation between first principles and machine learning methods. Brad is currently a student researcher in the Advanced Multimedia Research Lab, University of Wollongong and works in the energy and resources industry as a senior data scientist. Brad holds a Master of Computer Science (2021) and Bachelor of Mathematics (2019) from the University of Wollongong, where his research interests include computer vision, applied mathematical modelling, optimisation methodologies and machine learning.
+\end{IEEEbiography}
+
+
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{authorImages/philip.jpg}}]{Philip O. Ogunbona}
+	received the bachelor’s degree in electronic and electrical engineering from the University of Ife, Nigeria, and the D.I.C. (electrical engineering) and Ph.D. degrees from Imperial College London. After his graduation, he has worked for many years at the University of Wollongong, Australia, and the Motorola Multimedia Center Laboratory. He is currently a Professor and the Co-Director of the Advanced Multimedia Research Lab, University of Wollongong, Australia. His research interests include computer vision, pattern recognition, medical imaging, and machine learning.
+\end{IEEEbiography}
+
+%\vspace{11pt}
+
+%\begin{IEEEbiographynophoto}{Professor Philip O. Ogunbona}
+%\phantom{}
+%\end{IEEEbiographynophoto}
+\vfill
+
+\end{document}

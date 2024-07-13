@@ -1,0 +1,187 @@
+\section{Preliminaries}\label{section:prelim}
+
+\subsection{Optical Flow Derivation}
+
+\IEEEPARstart{}{}The intensity of a pixel, $I$, at position $(x, y, t)$ can be represented by $I(x, y, t)$. At a small step in time, $\delta t$, the pixel will have moved by $\delta x$ and $\delta y$ amounts respectively. Assuming that the brightness is consistent between frames, the intensity of the new frame can then be represented as $I(x+\delta x, y + \delta y, t + \delta t)$. By means of Taylor expansion, assuming small displacements, we can obtain;
+\begin{align*}
+	I(x+\delta x, y + \delta y, t + \delta t) &= I(x, y, t) \\ &+ \frac{\partial I}{\partial x} \delta x + \frac{\partial I}{\partial y} \delta y + \frac{\partial I}{\partial t} \delta t + \mathcal{O}(I^2 )
+\end{align*}
+By truncating the higher order terms it follows that;
+\begin{align*}
+	0 &= \frac{\partial I}{\partial x} \delta x + \frac{\partial I}{\partial y} \delta y + \frac{\partial I}{\partial t} \delta t  \\
+	0 &= \frac{\partial I}{\partial x} \frac{\delta x}{\delta t} + \frac{\partial I}{\partial y} \frac{\delta y}{\delta t} + \frac{\partial I}{\partial t} \frac{\delta t}{\delta t} \\
+	0 &= \frac{\partial I}{\partial x} \frac{\mathrm{d}x}{\mathrm{d} t} + \frac{\partial I}{\partial y} \frac{\mathrm{d} y}{\mathrm{d} t} + \frac{\partial I}{\partial t} \\
+	0 &= I_x u + I_y v + I_t,
+\end{align*}
+resulting in the \textit{linearised} Optical Flow equation;
+\begin{equation} \label{eq:opt_flow}
+	0 = \nabla I \cdot \vec{V} + I_t. 
+\end{equation}
+
+\IEEEPARstart{}{} Equation \ref{eq:opt_flow} contains two unknowns for one known and therefore there exists an infinite number of solutions. \color{red}(I don't like this sentence, but I'm unsure how to change it to convey the same message) \color{black} This is known as the \textit{aperture problem}. This aperture problem arises from the inherent ambiguity in determining the true motion direction of objects when only partial or limited information is available, i.e. the size of the aperture is too small. To compute the \textit{true} optical flow, additional information is required, normally by introducing additional constraints.
+
+\subsection{Variational Methods}
+
+\IEEEPARstart{}{} Among the most successful and widely used traditional techniques for optical flow estimation are variational methods. These schemes estimate optical flow by minimizing an energy functional. By formulating the problem as an energy minimization task, variational techniques leverage the mathematical framework of variational calculus to optimise the flow field and capture complex motion patterns. In particular, variational techniques are attempting to minimize the energy functional $F$ such that we obtain;
+\begin{equation}
+	\inf \Bigg\{ F[u] = \int_{\Omega} f(x, u(x), \nabla u(x)) \; \mathrm{d}x\Bigg\}.
+\end{equation}
+This typically found through solving the Euler-Lagrange equation, as shown in equation \ref{eq:euler-lagrange}, either directly or through numerical methods, which are predominantly iterative in nature. \color{orange}(COMMENT TO PHILIP: more opportunities for us to unroll other variational methods? Or even a generic framework for solving PDEs through unrolled iterative techniques?) What about an unrolled RK4 for ODEs or a generic finite element solver for PDEs? Would it be possible to do this irrespective of the designed mesh (i.e. infinite resolution)? The more that I'm diving into unrolling, I'm thinking that a key concept for my overall thesis lies in unrolling and numerical solutions to PDEs (at least the key connections here from an analysis point of view) with the application to computer vision.\color{black}
+\begin{equation} \label{eq:euler-lagrange}
+	\frac{\partial f}{\partial u} - \frac{\mathrm{d}}{\mathrm{d}x} \frac{\partial f}{\partial \dot{u}} = 0.
+\end{equation}
+The choice of $f$ has the effect of determining what image problem we are attempting to solve. The Horn-Schunck method is one of the foundational variational methods that enforces a global constraint of smoothness, in the flow sense, to solve the aperture problem. The method constructs the energy functional with regularization parameter $\alpha$ to be minimised;
+\begin{equation*}
+	F[u] = \iint ( I_x u + I_y v + I_t)^2 + \alpha (||\nabla u||^2 + ||\nabla v||^2) \; \mathrm{d}x \mathrm{d}y.
+\end{equation*}
+This minimisation is reduced through the Euler-Lagrange equations to form the system of PDEs to solve over;
+\begin{equation}
+		0 = \nabla I (\nabla I \cdot \vec{V} + I_t ) - \alpha^2 \Delta \vec{V}.
+\end{equation}
+
+\IEEEPARstart{} Most variational techniques, such as the Horn-Schunck presented above, have the underlying weakness from their assumptions of brightness constancy and smoothness that don't hold true in practice. Considering the limitations of traditional variational techniques in handling real-world challenges, alternative approaches leveraging deep learning have gained attention for optical flow estimation.
+
+\subsection{Lucas-Kanade Optical Flow Estimation}
+
+\IEEEPARstart{}{} Lucas and Kanade approached the aperture problem through the assumption that within a local neighbourhood of pixels, flow should be constant. The key idea behind this method is to construct a set of linear equations from a window to solve via the least squares method. Using this additional pixel information, selected from an $m \times n$ image window, the method forms the system of equations;
+\begin{align*}
+    0 &= I_x(p_1) u + I_y(p_1) v + I_t(p_1) \\
+    \vdots & \\
+    0 &= I_x(p_{m n}) u + I_y(p_{m n}) v + I_t(p_{m n}),
+\end{align*}
+equivalently;
+\begin{equation*}
+    \begin{bmatrix}
+        I_x(p_1) & I_y(p_1) \\
+        \vdots & \vdots \\
+        I_x(p_{m n}) & I_(p_{m n}) 
+    \end{bmatrix}
+    \begin{bmatrix}
+        u \\
+        v
+    \end{bmatrix}
+    = 
+    - \begin{bmatrix}
+        I_t(p_1) \\
+        \vdots \\
+        I_t(p_{m n})
+    \end{bmatrix},
+\end{equation*}
+which we will notate using the boldface font to mean the system;
+\begin{equation}
+	\nabla \mathbf{I} \cdot \vec{V} = - \mathbf{I}_t.
+\end{equation}
+The solution to this systems comes though solving the least squares problem;
+\begin{align*}
+    0 &= \nabla \mathbf{I} \cdot \vec{V} + \mathbf{I}_t \\
+    - \mathbf{I}_t &= \nabla \mathbf{I} \cdot \vec{V} \\
+    - (\nabla \mathbf{I})^T I_t &= (\nabla \mathbf{I})^{T} \nabla \mathbf{I} \cdot \vec{V} \\
+    - \nabla \mathbf{I}^T \mathbf{I}_t &= (\nabla \mathbf{I}^{T} \nabla \mathbf{I}) \cdot \vec{V} \\
+    - (\nabla \mathbf{I}^{T} \nabla \mathbf{I})^{-1} \nabla \mathbf{I}^T \mathbf{I}_t &= (\nabla \mathbf{I}^{T} \nabla \mathbf{I})^{-1}(\nabla \mathbf{I}^{T} \nabla \mathbf{I}) \cdot \vec{V} \\
+    \vec{V} &= -(\nabla \mathbf{I}^{T} \nabla \mathbf{I})^{-1} \nabla \mathbf{I}^T \mathbf{I}_t.
+\end{align*}
+For a solution to exist, $\nabla \mathbf{I}^{T} \nabla \mathbf{I}$ is required to be invertiable, i.e. $\det(\nabla \mathbf{I}^{T} \nabla \mathbf{I}) \ne 0$. Additionally, the eigenvalues of $\nabla \mathbf{I}^{T} \nabla \mathbf{I}$, $\lambda_1$ and $\lambda_2$ to have sufficiently large magnitude to alleviate any stability issues. The ratio and magitude of $\lambda_1$ and $\lambda_2$ can be used to infer if the current pixel is a corner, edge or neither, where corners and edges give more reliable optical flow information. Fullfilment of these conditions is a key weakness of the least squares approach.
+
+% \subsection{Level Set Methods}
+
+% The study of curve evolution is a fundamental aspect of numerous scientific problems, where the curves often represent the boundaries between different media. These boundaries are subject to their own geometric properties and the physical laws that govern their motion, leading to complex behaviours such as breakups, mergers, and disappearances over time. Understanding these phenomena is crucial for tackling a broad range of scientific challenges, from fluid dynamics to materials science and in our case computer vision.
+
+% By representing curves or boundaries as evolving level sets, the level set method allows for the accurate tracking and analysis of object boundaries, segmentation, and shape modelling. The use of level set functions in image processing enables efficient and flexible handling of complex geometric evolutions and topology changes. The distinct advantage of using level set methods include eliminating the need for parametrising the surfaces and shapes making it easy to follow when these shapes change topology, i.e. when the shape splits into two or deforms significantly. This is ever important for imaging applications where an object becomes occluded temporally.
+
+% \begin{figure*}[h!t]
+	% \centering
+	% \includegraphics[width=0.72\textwidth]{./images/levelset-example.jpg}
+	% \caption[Level Set Method concept]{\color{red} Redo this diagram using Tikz? This figure is acting as a placeholder to demonstrate the levelset method concept. I will need to redo this as it is not my original work.  \color{black}}
+	% \label{fig:level_set_method}
+% \end{figure*}
+
+% Formally, $\Gamma$ is the embedding of the Lipschitz continuous function $\varphi$ at the 0-level, i.e. $\Gamma := \{\varphi (x, y) = 0 : x, y \in \mathbb{R}^2\}$ where $\varphi$ is the hypersurface that intersects the plane of our image. If the curve $\Gamma$ moves in the normal direction to $\varphi$ with speed $v$, then the level set function $\varphi$ satisfies the level set equation;
+
+% \begin{equation}
+	% \frac{\partial \varphi}{\partial t} = v |\nabla \varphi|.
+% \end{equation} 
+
+% This PDE details the temporal evolution of the curve $\Gamma$, where the choice of the function $\varphi$ is often arbitrary with the provision that at the 0-level $\varphi$ satisfies the associated constraints. Solving this level set PDE is often performed using finite differences. This can be computationally expensive, where workarounds can include sparsely sampling the image for a coarser mesh. Level set methods require careful construction of appropriate velocities to advance the level set function to perform the appropriate task. 
+
+% A \textit{natural} choice for the evolution of contours would be a reference to the motion of it's mean curvature;
+% \begin{equation}
+	% v = \mathrm{div} \Bigg(\frac{\nabla \varphi}{|\nabla \varphi|}\Bigg).
+% \end{equation}
+% This formulation allows for the contours to shrink uniformly \color{red}(\textit{spherically?})\color{black} and smoothly via the evolution of the curve, however, it implies that the edges within the image needs to be strong, clear, noise-free and connected. This is often not representative to what occurs in practice. Chen and Vese combined energy minimisation methods, through variational calculus and a level set formulation to provide active contours without edges \cite{chan2001active}. Their model minimises the following energy functional;
+
+% \begin{align*}
+	% F[u] &= \mu \int_{\Omega} \delta(\varphi (x, y)) | \nabla \varphi (x, y) | \; \mathrm{d}x \mathrm{d}y \\
+	% & + \nu \int_{\Omega} H(\varphi (x, y)) \; \mathrm{d}x \mathrm{d}y \\
+	% & + \lambda_1  \int_{\Omega} |I(x, y) - c_1|^2 H(\varphi (x, y))  \; \mathrm{d}x \mathrm{d}y \\
+	% & + \lambda_2  \int_{\Omega} |I(x, y) - c_2|^2 (1 - H(\varphi (x, y)))  \; \mathrm{d}x \mathrm{d}y,
+% \end{align*}
+
+ % where $\nu$ is a positive constant, $\delta(\cdot)$ is the Dirac delta function, $H(\cdot)$ is the Heaviside step function, $c_1$ is the average of the image $I$ inside the region of segmentation, i.e. where $\varphi(x, y) > 0$ and $c_2$ is the corresponding average outside the segmented region, i.e. where $\varphi(x, y) < 0$. 
+ 
+% This functional allows for control over the curves length through the term $\mu \int_{\Omega} \delta(\varphi (x, y)) | \nabla \varphi (x, y) | \; \mathrm{d}x \mathrm{d}y $ ensuring that the curve isn't overly complex. 
+ 
+ % Finding the function that is minimises the previous functional is done via the solution of the Euler-Lagrange PDE;
+% \begin{equation*}
+		% \frac{\partial \varphi}{\partial t} = \delta (\varphi) \Big[\mu | \nabla \varphi |  \mathrm{div} \Big(\frac{\nabla \varphi}{|\nabla \varphi|}\Big) - \nu - \lambda_1 (I-c_1)^2 + \lambda_2 (I-c_2)^2\Big],
+% \end{equation*}
+% subject to the condition,
+% \begin{equation*}
+% \frac{\delta(\varphi)}{|\nabla \varphi|} \frac{\partial \varphi}{\partial \vec{n}} = 0 \quad \mathrm{on} \; \partial \Omega.
+% \end{equation*}
+
+% Traditionally these PDEs are solved using numerical methods such as finite elements which can be computationally expensive. Within our work we aim to use a physics informed neural network influenced by the Chen Vese level set formulation to appropriately segment and detect contours of interest to understand their evolution temporally. By treating evolutions of curves as the primary interest point instead of pixel based approaches, we aim to remove the smoothness constraint required to solve the aperture problem. We leverage the deep learning paradigm, through physics informed computer vision, to serve as a fast numerical approximation method to solve the underlying system without explicitly handcrafting features and without the need for finite elements.
+% \color{black}
+
+\subsection{Algorithm Unrolling}
+
+\IEEEPARstart{}{} Algorithm unrolling is technique that converts traditional iterative optimization algorithms into trainable deep neural networks. This process involves expressing each iteration of an algorithm as a layer within a neural network architecture. The unrolling technique begins with an optimization algorithm, that involves repeating a series of operations until convergence is achieved. By unrolling these iterations, each step of the algorithm is mapped to a corresponding layer in a neural network. This transformation allows the parameters of each layer, originally the fixed parameters of the iterative steps, to be learned during the training process. Unrolling permits the network to optimize these parameters adapting them for better performance on specific tasks. The general process is to take each of the update steps;
+\begin{equation*}x^{(i+1)} \leftarrow \mathcal{F}(x^{(i)}, \Theta), \;\mathrm{for}\; i \in \{1, \dots, n - 1\},
+\end{equation*}
+and stack each iteration into $n$ layers of a neural network. 
+
+\color{red}(Should I have a little diagram showing this?)\color{black}
+
+\IEEEPARstart{}{} A primary advantage lies in its ability to accelerate convergence. Traditional iterative methods may require a significant number of iterations to reach an optimal solution, especially in high-dimensional or complex problem spaces. When these iterations are unrolled into a finite number of neural network layers, the network is trained to optimise the parameters for each unrolled iteration, ensuring efficient convergence. Moreover, algorithm unrolling provides a structured method to incorporate domain-specific knowledge, \textit{the physics of the system}, into the learning process as a strong prior. Each layer retains the interpretability of its corresponding iterative step, offering insights into the network's functionality and decision-making process, giving attributes of interpretability, explainability and ensuring the results conform to the known physics.
+
+\IEEEPARstart{}{} A classical and concrete example of algorithm unrolling can be made by observing the Iterative Shrinkage Thresholding Algorithm, ISTA. The classical ISTA aims to optimise the problem;
+\begin{equation}
+\min \frac{1}{2} ||Ax - y||^2_{L_2} + ||\lambda x||_{L_1}, 
+\end{equation}
+by iterating until there is convergence for a solution of $x$, using the update rule;
+\begin{equation}
+	x^{(k+1)} \leftarrow S_{\alpha} \Big(x^{(k)} - \frac{1}{L} A^T(A x^{(k)} - y)\Big),
+\end{equation}
+where $S_{\alpha}(\star) \triangleq \sign(\star) \cdot \max \{|\star| - \alpha, 0\}$, is the shrinkage operator, (soft-thresholding operator with threshold $\alpha$). Instead the unrolled version can be designed by stacking $K$ iterations together, forming a $K$-layer deep network. Implicit substitutions are made, $A_t = I - \frac{1}{L}A^T A$ and $A_e = \frac{1}{L}A^T$, where $I$ is the identity matrix, creating the parameters $A_t$, $A_e$ and $\alpha$ for the network. Training is performed, through a loss function $\ell$, defined as;
+\begin{equation}
+	\ell(A_t, A_e, \alpha) = \frac{1}{n} \sum_{i=1}^{n} \big|\big|x^{(i)} - \hat{x}^{(i)}(y^{(i)};A_t,A_e,\alpha)\big|\big|^2_2,
+\end{equation}
+by forming a sequence of vectors $y^{1}, \dots, y^{n}$ and their relative solution vectors $x^1, \dots, x^n$, as the ground truth. 
+
+\subsection{Physics Informed Neural Networks}
+
+\IEEEPARstart{}{} Physics Informed Neural Networks (PINNs) are a novel class of neural network that merge deep learning techniques with the laws of physics to solve complex physical problems. By incorporating known physics as a prior for the network, PINNs offer a framework for efficient and precise modelling, simulation, and prediction in diverse scientific domains. This integration of domain knowledge enhances the interpretability, generalisability, and robustness of neural network models. Their strength lies where small amounts of data is available and there is a partial understanding of the physics involved.  
+
+\IEEEPARstart{}{} Neural network architectures can incorporate physics through three main methodologies. Firstly, the direct embedding of mathematics within the network's architecture, known as inductive bias, enables the network to incorporate prior knowledge of the system. This can be done via embedding phyical laws such as the conservation of energy, or by embedding iterative solvers designed to solve differential equations that explain the system. The method presented in this work induces bias into the networks architecture by unrolling a gradient descent method to solve the physics of optical flow. Secondly, by providing the network with physics-driven information, such as leveraging observational biases, guides the network towards appropriate inference, such as exploiting symmetries in molecular structures or in imaging sequences. Lastly, a learning bias can be introduced by penalizing the network when its learning deviates from the underlying physical laws. This approach often involves incorporating the mathematical model underlying the system directly into the network's loss function, causing the network to learn by optimising over the physics. \color{orange}
+
+NOTE: Two things;
+\begin{enumerate}
+	\item Do I need these preliminaries for this audience (I feel as if these are too basic and are only here for completeness)? Would it be weird to only have physics-informed neural networks and algorithm unrolling without the two methods?
+	\item I have included Horn-Schunck and Lucus-Kanade because the plan is to unroll both and to compare to the traditional.
+\end{enumerate}
+\color{black}
+
+% \color{orange}
+% \IEEEPARstart{}{} Learning of the operators can be done simply through parametrisation. Here we will denote a parametrised operator using the following notation $L[u; \theta]$. Add more detail talking about operator learning in general. Link this back to using operators within the image/computer vision space.
+
+% Consider the operator $\mathcal{G}$, that maps from the input function $f^{in}$ to the output function $f^{out}$ such that $\mathcal{G}: f^{in} \to f^{out}$. 
+
+% Theorem by Karniadakis 2022 (find the bibTeX for this!)
+
+% \begin{theorem}[Universal approximation theorem for operators]
+	% Suppose that $\mathcal{X}$ is a Banach space, $K_1 \subset \mathcal{X}$ and $K_2 \subset \mathbb{R}^{d}$ are two compact subsets in $\mathcal{X}$ and  $\mathbb{R}^{d}$ respectively. Additionally suppose, $V$ is a compact set in $C(K_1)$. Assume that the map $\mathcal{G}: V \to C(K_2)$ is a continuous non-linear operator. Then for any $\varepsilon > 0$, there exists positive integers $n, p, m$, constants $c^k_i, \xi^k_{ik}, \theta^k_{ij}, \zeta_k \in \mathbb{R}, w_k \in \mathbb{R}^d, x_j \in K_1, i \in \{1, \dots, n\}, j \in \{1, \dots, m\}$ and $k \in \{1, \dots, p\}$ such that
+	% \begin{equation*}
+		% \Bigg|\mathcal{G}(u)(y) - \sum_{k=1}^{p}\sum_{i=1}^{n} c_i^k \sigma \Big(\sum_{j=1}^{m} \xi^k_{ij} u(x_j) + \theta^k_i\Big)\;\sigma(w_k \cdot y + \zeta_k)\Bigg| < \varepsilon
+	% \end{equation*}
+	% holds for all $u \in V$ and $y \in K_2$.
+% \end{theorem}
+% \color{black}
