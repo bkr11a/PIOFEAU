@@ -25,7 +25,7 @@ ARTICLE_DIR = reports
 journal_article: compile_latex move_pdf clean_latex
 
 compile_latex:
-	cd $(TEX_DIR) && pwd && pdflatex "$(LATEX)"
+	cd $(TEX_DIR) && pdflatex "$(LATEX)"
 
 move_pdf:
 	mv "$(TEX_DIR)/$(PDF)" "$(ARTICLE_DIR)/$(PDF)"

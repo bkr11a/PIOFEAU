@@ -42,7 +42,7 @@ This is a description of the project and I need to modify it here.
 │
 └── src                <- Source code for use in this project.
     │
-    └── PIOFE-Unrolling
+    ├── PIOFE-Unrolling
     |   └── __init__.py    <- Makes PIOFE-Unrolling a Python module
     │
     ├── data           <- Scripts to download or generate data
