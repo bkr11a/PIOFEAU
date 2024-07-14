@@ -1,4 +1,4 @@
-.PHONY: compile_latex move_pdf journal_article clean_latex
+.PHONY: compile_latex move_pdf journal_article clean_latex clean requirements_file
 
 ###############
 #   GLOBALS   #
@@ -18,10 +18,30 @@ LATEX = $(ARTICLE_NAME).tex
 TEX_DIR = reports/typesetting
 ARTICLE_DIR = reports
 
+VENV_DIR = POIFE-Unrolling-venv
+
 ###############
 #  COMMANDS   #
 ###############
 
+# Clean ALL Directories
+clean:
+	rm -rf assets;
+	rm -rf data;
+	rm -rf docs;
+	rm -rf notebooks;
+	rm -rf $(VENV_DIR);
+	rm -rf references;
+	rm -rf reports;
+	rm -rf src;
+	rm -rf tests;
+	rm -rf .env .gitignore cleanup.sh LICENSE Makefile poetry.lock pyproject.toml README.md requirements.txt setup.cfg
+
+# Push requirements out to a requirements.txt
+requirements_file:
+	pip freeze > requirements.txt
+
+# LATEX Journal Article Commands #
 journal_article: compile_latex move_pdf clean_latex
 
 compile_latex:
