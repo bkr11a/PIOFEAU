@@ -189,6 +189,9 @@ cython_debug/
 # Optical Flow flo files
 *.flo
 
+# Make sure no assets are uploaded.
+/assets/
+
 # LaTeX compilation files.
 
 ## Core latex/pdflatex auxiliary files:
