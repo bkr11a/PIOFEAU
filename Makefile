@@ -53,4 +53,4 @@ move_pdf:
 	mv "$(TEX_DIR)/$(PDF)" "$(ARTICLE_DIR)/$(PDF)"
 
 clean_latex:
-	cd $(TEX_DIR) && rm -f "$(ARTICLE_NAME).aux" "$(ARTICLE_NAME).toc" "$(ARTICLE_NAME).out" "texput.fls"
+	cd $(TEX_DIR) && rm -f "$(ARTICLE_NAME).aux" "$(ARTICLE_NAME).toc" "$(ARTICLE_NAME).out" "texput.fls" "$(ARTICLE_NAME).bbl" "$(ARTICLE_NAME).blg"
