@@ -13,8 +13,10 @@ PYTHON_INTERPRETER = python
 ###############
 
 ARTICLE_NAME = Physics-Informed Optical Flow Estimation via Algorithm Unrolling
+BIBLIOGRAPHY_NAME = phys
 PDF = $(ARTICLE_NAME).pdf
 LATEX = $(ARTICLE_NAME).tex
+BIB_FILE = $(BIBLIOGRAPHY_NAME).bib
 TEX_DIR = reports/typesetting
 ARTICLE_DIR = reports
 
@@ -45,7 +47,7 @@ requirements_file:
 journal_article: compile_latex move_pdf clean_latex
 
 compile_latex:
-	cd $(TEX_DIR) && pdflatex "$(LATEX)"
+	cd $(TEX_DIR) && pdflatex "$(LATEX)" && bibtex "$(ARTICLE_NAME)" && pdflatex "$(LATEX)" && pdflatex "$(LATEX)"
 
 move_pdf:
 	mv "$(TEX_DIR)/$(PDF)" "$(ARTICLE_DIR)/$(PDF)"
