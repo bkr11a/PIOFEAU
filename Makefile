@@ -1,4 +1,4 @@
-.PHONY: compile_latex move_pdf journal_article clean_latex clean requirements_file
+.PHONY: compile_latex move_pdf journal_article clean_latex clean requirements_file activate_venv
 
 ###############
 #   GLOBALS   #
@@ -54,3 +54,6 @@ move_pdf:
 
 clean_latex:
 	cd $(TEX_DIR) && rm -f "$(ARTICLE_NAME).aux" "$(ARTICLE_NAME).toc" "$(ARTICLE_NAME).out" "texput.fls" "$(ARTICLE_NAME).bbl" "$(ARTICLE_NAME).blg"
+
+activate_venv:
+	pwd && source ${VENV_DIR}/bin/activate
