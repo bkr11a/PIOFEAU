@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
-from utils.OpticalFlowUtils import FlowReader
+from src.modeling.utils.OpticalFlowUtils import FlowReader
 
 class MPISintelHandler:
     def __init__(self):

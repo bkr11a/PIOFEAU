@@ -1,4 +1,4 @@
-.PHONY: compile_latex move_pdf journal_article clean_latex clean requirements_file activate_venv
+.PHONY: compile_latex move_pdf journal_article clean_latex clean requirements_file activate_venv start_tensorboard_session end_tensorboard_session
 
 ###############
 #   GLOBALS   #
@@ -57,3 +57,9 @@ clean_latex:
 
 activate_venv:
 	pwd && source ${VENV_DIR}/bin/activate
+
+start_tensorboard_session:
+	pwd && ls -la && source runTensorboardSession.sh
+
+end_tensorboard_session:
+	source killTensorboardSession.sh

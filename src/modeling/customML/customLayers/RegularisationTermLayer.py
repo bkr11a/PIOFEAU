@@ -10,12 +10,17 @@ class RegularisationTermLayer(tf.keras.layers.Layer):
 
     @tf.function
     def call(self, Inputs):
-        u, v = Inputs
+        flow = Inputs
 
-        u_grad_x, u_grad_y = tf.image.image_gradients(u)
-        v_grad_x, v_grad_y = tf.image.image_gradients(v)
+        u = flow[:, :, :, 0]
+        v = flow[:, :, :, 1]
 
-        u_next = u - self.alpha * (u_grad_x + u_grad_y)
-        v_next = v - self.alpha * (v_grad_x + v_grad_y)
+        u_grad_x, u_grad_y = tf.image.image_gradients(tf.expand_dims(u, axis = -1))
+        v_grad_x, v_grad_y = tf.image.image_gradients(tf.expand_dims(v, axis = -1))
 
-        return u_next, v_next
+        u_next = u - self.alpha * (u_grad_x[:, :, :, 0] + u_grad_y[:, :, :, 0])
+        v_next = v - self.alpha * (v_grad_x[:, :, :, 0] + v_grad_y[:, :, :, 0])
+
+        flow_next = tf.stack([u_next, v_next], axis = -1)
+
+        return flow_next
