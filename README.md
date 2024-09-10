@@ -1,10 +1,6 @@
 # PIOFE-Unrolling
 
-<a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
-    <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
-</a>
-
-This is a description of the project and I need to modify it here.
+Add a valid description here
 
 ## Project Organization
 
