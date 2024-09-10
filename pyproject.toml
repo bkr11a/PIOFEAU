@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["bkr11a <bkr11a@hotmail.com>"]
 readme = "README.md"
-packages = [{include = "piofe_unrolling", from = "src"}]
+packages = [{include = "piofe_unrolling", from = "src"}, {include = "modelling", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -17,7 +17,6 @@ scikit-learn = "^1.5.0"
 pandas = "^2.2.2"
 openpyxl = "^3.1.4"
 loguru = "^0.7.2"
-
 
 [tool.poetry.group.eda.dependencies]
 jupyterlab = "^4.2.2"

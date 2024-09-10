@@ -135,6 +135,7 @@ celerybeat.pid
 .env
 .venv
 .venv-linux
+.venv-311
 env/
 venv/
 PIOFE-Unrolling-venv/
