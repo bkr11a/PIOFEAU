@@ -1,6 +1,6 @@
 \section{Preliminaries}\label{section:prelim}
 
-\subsection{Optical Flow Derivation}
+\subsection{Optical Flow Constraint Equation}
 
 \IEEEPARstart{}{}The intensity of a pixel, $I$, at position $(x, y, t)$ can be represented by $I(x, y, t)$. At a small step in time, $\delta t$, the pixel will have moved by $\delta x$ and $\delta y$ amounts respectively. Assuming that the brightness is consistent between frames, the intensity of the new frame can then be represented as $I(x+\delta x, y + \delta y, t + \delta t)$. By means of Taylor expansion, assuming small displacements, we can obtain;
 \begin{align*}
@@ -18,28 +18,29 @@ resulting in the \textit{linearised} Optical Flow equation;
 	0 = \nabla I \cdot \vec{V} + I_t. 
 \end{equation}
 
-\IEEEPARstart{}{} Equation \ref{eq:opt_flow} contains two unknowns for one known and therefore there exists an infinite number of solutions. \color{red}(I don't like this sentence, but I'm unsure how to change it to convey the same message) \color{black} This is known as the \textit{aperture problem}. This aperture problem arises from the inherent ambiguity in determining the true motion direction of objects when only partial or limited information is available, i.e. the size of the aperture is too small. To compute the \textit{true} optical flow, additional information is required, normally by introducing additional constraints.
+\IEEEPARstart{}{} Equation \ref{eq:opt_flow} contains two unknowns for one equation and, therefore has an infinite number of solutions. The optical flow constraint equation is an \textit{ill-posed} problem. This is known as the \textit{aperture problem}. This aperture problem arises from the inherent ambiguity in determining the true motion direction of objects when only partial or limited information is available, i.e. the size of the aperture is too small. To compute the \textit{true} optical flow, additional information is required, normally by introducing additional constraints.
 
 \subsection{Variational Methods}
 
-\IEEEPARstart{}{} Among the most successful and widely used traditional techniques for optical flow estimation are variational methods. These schemes estimate optical flow by minimizing an energy functional. By formulating the problem as an energy minimization task, variational techniques leverage the mathematical framework of variational calculus to optimise the flow field and capture complex motion patterns. In particular, variational techniques are attempting to minimize the energy functional $F$ such that we obtain;
+\IEEEPARstart{}{} Among the most successful and widely used classical techniques for optical flow estimation are variational methods. These schemes estimate optical flow by minimizing an energy functional. By formulating the problem as an energy minimization task, variational techniques leverage the mathematical framework of variational calculus to optimise the flow field and capture complex motion patterns. In particular, variational techniques are attempting to minimize the energy functional $F$ such that we obtain;
 \begin{equation}
 	\inf \Bigg\{ F[u] = \int_{\Omega} f(x, u(x), \nabla u(x)) \; \mathrm{d}x\Bigg\}.
 \end{equation}
-This typically found through solving the Euler-Lagrange equation, as shown in equation \ref{eq:euler-lagrange}, either directly or through numerical methods, which are predominantly iterative in nature. \color{orange}(COMMENT TO PHILIP: more opportunities for us to unroll other variational methods? Or even a generic framework for solving PDEs through unrolled iterative techniques?) What about an unrolled RK4 for ODEs or a generic finite element solver for PDEs? Would it be possible to do this irrespective of the designed mesh (i.e. infinite resolution)? The more that I'm diving into unrolling, I'm thinking that a key concept for my overall thesis lies in unrolling and numerical solutions to PDEs (at least the key connections here from an analysis point of view) with the application to computer vision.\color{black}
+This typically found through solving the Euler-Lagrange equation, as shown in equation \ref{eq:euler-lagrange}, either directly or through numerical methods, which are predominantly iterative in nature. 
 \begin{equation} \label{eq:euler-lagrange}
 	\frac{\partial f}{\partial u} - \frac{\mathrm{d}}{\mathrm{d}x} \frac{\partial f}{\partial \dot{u}} = 0.
 \end{equation}
-The choice of $f$ has the effect of determining what image problem we are attempting to solve. The Horn-Schunck method is one of the foundational variational methods that enforces a global constraint of smoothness, in the flow sense, to solve the aperture problem. The method constructs the energy functional with regularization parameter $\alpha$ to be minimised;
+The choice of $f$ has the effect of determining what image problem we are attempting to solve. The Horn-Schunck method is one of the foundational variational methods that enforces a global constraint of flow smoothness, to solve the aperture problem. The method constructs the energy functional with regularization parameter $\alpha$ to be minimised;
 \begin{equation*}
 	F[u] = \iint ( I_x u + I_y v + I_t)^2 + \alpha (||\nabla u||^2 + ||\nabla v||^2) \; \mathrm{d}x \mathrm{d}y.
 \end{equation*}
 This minimisation is reduced through the Euler-Lagrange equations to form the system of PDEs to solve over;
 \begin{equation}
-		0 = \nabla I (\nabla I \cdot \vec{V} + I_t ) - \alpha^2 \Delta \vec{V}.
+		0 = \nabla I (\nabla I \cdot \vec{V} + I_t ) - \alpha^2 \Delta \vec{V},
 \end{equation}
+and is typically solved via gradient descent.
 
-\IEEEPARstart{} Most variational techniques, such as the Horn-Schunck presented above, have the underlying weakness from their assumptions of brightness constancy and smoothness that don't hold true in practice. Considering the limitations of traditional variational techniques in handling real-world challenges, alternative approaches leveraging deep learning have gained attention for optical flow estimation.
+\IEEEPARstart{} Most variational techniques, such as the Horn-Schunck presented above, have the underlying weakness from their assumptions of brightness constancy and smoothness that don't hold true in practice, require careful handcrafting and are inheritly inflexible. Considering the limitations of traditional variational techniques in handling real-world challenges, alternative approaches leveraging deep learning have gained attention for optical flow estimation.
 
 \subsection{Lucas-Kanade Optical Flow Estimation}
 
@@ -80,7 +81,7 @@ The solution to this systems comes though solving the least squares problem;
     - (\nabla \mathbf{I}^{T} \nabla \mathbf{I})^{-1} \nabla \mathbf{I}^T \mathbf{I}_t &= (\nabla \mathbf{I}^{T} \nabla \mathbf{I})^{-1}(\nabla \mathbf{I}^{T} \nabla \mathbf{I}) \cdot \vec{V} \\
     \vec{V} &= -(\nabla \mathbf{I}^{T} \nabla \mathbf{I})^{-1} \nabla \mathbf{I}^T \mathbf{I}_t.
 \end{align*}
-For a solution to exist, $\nabla \mathbf{I}^{T} \nabla \mathbf{I}$ is required to be invertiable, i.e. $\det(\nabla \mathbf{I}^{T} \nabla \mathbf{I}) \ne 0$. Additionally, the eigenvalues of $\nabla \mathbf{I}^{T} \nabla \mathbf{I}$, $\lambda_1$ and $\lambda_2$ to have sufficiently large magnitude to alleviate any stability issues. The ratio and magitude of $\lambda_1$ and $\lambda_2$ can be used to infer if the current pixel is a corner, edge or neither, where corners and edges give more reliable optical flow information. Fullfilment of these conditions is a key weakness of the least squares approach.
+For a solution to exist, $\nabla \mathbf{I}^{T} \nabla \mathbf{I}$ is required to be invertiable, i.e. $\det(\nabla \mathbf{I}^{T} \nabla \mathbf{I}) \ne 0$. Additionally, the eigenvalues of $\nabla \mathbf{I}^{T} \nabla \mathbf{I}$, $\lambda_1$ and $\lambda_2$ to have sufficiently large magnitude to alleviate any stability issues. The ratio and magitude of $\lambda_1$ and $\lambda_2$ can be used to infer if the current pixel is a corner, edge or neither, where textured objects within images give more reliable optical flow information. 
 
 % \subsection{Level Set Methods}
 
@@ -143,7 +144,7 @@ and stack each iteration into $n$ layers of a neural network.
 
 \IEEEPARstart{}{} A primary advantage lies in its ability to accelerate convergence. Traditional iterative methods may require a significant number of iterations to reach an optimal solution, especially in high-dimensional or complex problem spaces. When these iterations are unrolled into a finite number of neural network layers, the network is trained to optimise the parameters for each unrolled iteration, ensuring efficient convergence. Moreover, algorithm unrolling provides a structured method to incorporate domain-specific knowledge, \textit{the physics of the system}, into the learning process as a strong prior. Each layer retains the interpretability of its corresponding iterative step, offering insights into the network's functionality and decision-making process, giving attributes of interpretability, explainability and ensuring the results conform to the known physics.
 
-\IEEEPARstart{}{} A classical and concrete example of algorithm unrolling can be made by observing the Iterative Shrinkage Thresholding Algorithm, ISTA. The classical ISTA aims to optimise the problem;
+\IEEEPARstart{}{} LeCun and Gregor introduced the Learned Iterative Shrinkage-Thresholding Algorithm (LISTA) as an unrolled version of ISTA \cite{gregor2010learning} obtaining better performance than the traditional ISTA with fewer iterations, opening up an end to end learning framework for classical iterative techniques. Subsequently, algorithm unrolling has increased in popularity, shown significant advances and strong performance in solving inverse imaging problems by merging deep learning architectures with traditional optimisation approaches \cite{monga2021algorithm,yang2016deep, diamond2017unrolled}. The classical ISTA aims to optimise the problem;
 \begin{equation}
 \min \frac{1}{2} ||Ax - y||^2_{L_2} + ||\lambda x||_{L_1}, 
 \end{equation}
