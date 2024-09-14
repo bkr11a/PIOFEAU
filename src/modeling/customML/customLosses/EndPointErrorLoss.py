@@ -3,7 +3,7 @@ __version__ = 0.1
 
 import tensorflow as tf
 
-class EPE_Loss(tf.keras.losses.Loss):
+class AEPE_Loss(tf.keras.losses.Loss):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
     
