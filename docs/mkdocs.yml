@@ -1,4 +1,46 @@
-site_name: PIOFE-Unrolling
-# 
+site_name: Physics Informed Optical Flow Estimation via Algorithm Unrolling
 site_author: Brad Rice
-# 
+
+theme: 
+  name: material
+  features: 
+    - content.code.select
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - User Guide:
+    - Getting Started: user-guide/getting-started.md
+  - Reference:
+    - Custom Machine Learning:
+      - Layers:
+        - Bias Layer: api-reference/custom-ml/layers/bias-layer.md
+        - Cost Correlation Layer: api-reference/custom-ml/layers/cost-correlation-layer.md
+      - Losses: api-reference/custom-ml/losses.md
+      - Models: api-reference/custom-ml/models.md
+  - About: user-guide/about.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+plugins:
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [../src]
+          options:
+            docstring_options:
+              docstring_style: google
+              ignore_init_summary: false
+              trim_doctest_flags: false
+              show_if_no_docstring: true
+              show_docstring_description: true
+            merge_init_into_class: false
+            docstring_selection_style: list
