@@ -1,4 +1,4 @@
-.PHONY: compile_latex move_pdf journal_article clean_latex clean requirements_file activate_venv start_tensorboard_session end_tensorboard_session
+.PHONY: compile_latex move_pdf journal_article clean_latex clean requirements_file activate_venv start_tensorboard_session end_tensorboard_session build_docs
 
 ###############
 #   GLOBALS   #
@@ -63,3 +63,6 @@ start_tensorboard_session:
 
 end_tensorboard_session:
 	source killTensorboardSession.sh
+
+build_docs:
+	cd docs && mkdocs build
