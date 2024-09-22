@@ -1,15 +1,53 @@
 __author__ = "Brad Rice"
 __version__ = "0.1.0"
 
+from typing import List
+
 import tensorflow as tf
 
 class CostVolumeCorrelationLayer(tf.keras.layers.Layer):
+    """
+    CostVolumeCorrelationLayer _summary_
+
+    _extended_summary_
+
+    Args:
+        tf (_type_): _description_
+
+    Examples:
+        ``` py
+        # Import the custom module
+        from modeling.customML.customLayers import CostVolumeCorrelationLayer
+        
+        # Instantiate an instance of a CostVolumeCorrelationLayer
+        costVolumeLayer = CostCorrelationLayer(maxDisplacement = 3)
+        ```
+    """
     def __init__(self, maxDisplacement = 5, **kwargs):
+        """
+        __init__ _summary_
+
+        _extended_summary_
+
+        Args:
+            maxDisplacement (int, optional): _description_. Defaults to 5.
+        """
         super().__init__(**kwargs)
         self.maxDisplacement = maxDisplacement
 
     @tf.function
-    def call(self, Inputs):
+    def call(self, Inputs : List[tf.Tensor]) -> tf.Tensor:
+        """
+        call _summary_
+
+        _extended_summary_
+
+        Args:
+            Inputs (List[tf.Tensor]): _description_
+
+        Returns:
+            tf.Tensor: _description_
+        """
         F1, F2 = Inputs
         batch_size, height, width, channels = F1.shape
         padded_level = tf.pad(F2, [[0, 0], [self.maxDisplacement, self.maxDisplacement], [self.maxDisplacement, self.maxDisplacement], [0,0]])
