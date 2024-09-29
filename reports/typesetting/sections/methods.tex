@@ -1,7 +1,36 @@
-\section{Methods} \label{sec:method}
+\section{Methodology} \label{sec:method}
 \color{red}
 Here we should detail our methodology in detail.
 \color{gray}
+
+\subsection*{Overview}
+
+\IEEEPARstart{}{} This work proposes a novel approach to dense optical flow estimation. Optical flow is estimated by unrolling a Half-Quadratic Splitting algorithm and integrating it into a deep learning architecture, to iteratively find the dense optical flow field. This neural network is then trained by integrating the optical flow constraint equation into the networks loss function, thereby informing the network of the physics of optical flow through two methods; by inducing an optimised algorithmic solver and through the learning bias of the physics-based loss.
+
+\subsection*{Data Collection and Preperation}
+
+\IEEEPARstart{}{} 
+
+\subsection*{Model architecture}
+
+\IEEEPARstart{}{} 
+
+\subsection*{Training Proceedure}
+
+\IEEEPARstart{}{} 
+
+\subsection*{Evaluation Metrics}
+
+\IEEEPARstart{}{} 
+
+\subsection*{Reproducibility}
+
+\IEEEPARstart{}{} 
+
+\subsection*{Limitations and Assumptions}
+
+\IEEEPARstart{}{} 
+
 
 \IEEEPARstart{}{} Each image pair, and it's associated ground truth is split into '\textit{patches}', to reduce the visual field of the architecture. (sliding window (guassian function) or apply the YOLO logic?). \color{red} NOTE: we will need to define how we resolve the flow between patches? How do we reconstruct an image from a series of patches? (From the patches this means we could parallerise this process too). \color{gray} From these patches, for each pixel we will use a neighbourhood of surrounding pixels to form a linear system of optical flow equations to solve (Lucus-Kanade approach). This will be done via the unrolled proximal gradient descent physics-informed network.
 
@@ -40,7 +69,7 @@ And the physics informed variant used to train our unrolled network is;
 \end{equation*}
 
 \color{red}
-NOTE: removal of the EPE metric component of the loss function, and sole reliance on the physics loss could be used to train the model, and could be used to form a \textit{self-supervised} approach to learning.
+NOTE: removal of the EPE metric component of the loss function, and sole reliance on the physics loss could be used to train the model, and could be used to form a \textit{self-supervised} approach to learning. However, this might not be recommended due to the aperture problem, where some data might be required to ensure that the flow is coherent.
 \color{gray}
 
 \color{black}
