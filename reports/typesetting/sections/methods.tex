@@ -1,0 +1,75 @@
+\section{Methodology} \label{sec:method}
+\color{red}
+Here we should detail our methodology in detail.
+\color{gray}
+
+\subsection*{Overview}
+
+\IEEEPARstart{}{} This work proposes a novel approach to dense optical flow estimation. Optical flow is estimated by unrolling a Half-Quadratic Splitting algorithm and integrating it into a deep learning architecture, to iteratively find the dense optical flow field. This neural network is then trained by integrating the optical flow constraint equation into the networks loss function, thereby informing the network of the physics of optical flow through two methods; by inducing an optimised algorithmic solver and through the learning bias of the physics-based loss.
+
+\subsection*{Data Collection and Preperation}
+
+\IEEEPARstart{}{} 
+
+\subsection*{Model architecture}
+
+\IEEEPARstart{}{} 
+
+\subsection*{Training Proceedure}
+
+\IEEEPARstart{}{} 
+
+\subsection*{Evaluation Metrics}
+
+\IEEEPARstart{}{} 
+
+\subsection*{Reproducibility}
+
+\IEEEPARstart{}{} 
+
+\subsection*{Limitations and Assumptions}
+
+\IEEEPARstart{}{} 
+
+
+\IEEEPARstart{}{} Each image pair, and it's associated ground truth is split into '\textit{patches}', to reduce the visual field of the architecture. (sliding window (guassian function) or apply the YOLO logic?). \color{red} NOTE: we will need to define how we resolve the flow between patches? How do we reconstruct an image from a series of patches? (From the patches this means we could parallerise this process too). \color{gray} From these patches, for each pixel we will use a neighbourhood of surrounding pixels to form a linear system of optical flow equations to solve (Lucus-Kanade approach). This will be done via the unrolled proximal gradient descent physics-informed network.
+
+\subsection*{Unrolled Proximal Gradient Descent}
+
+Suppose we have some noise in our measurements, i.e. those from an imperfect sensor or other sources of noise, modelled as $\varphi(\cdot)$. And let's reconsider the minimisation problem for our least squares problem (now in the L2 sense);
+
+\begin{equation*}
+    \min_{\vec{V} \in BV(\Omega)} \Big|\Big| \nabla \mathbf{I} \cdot \vec{\hat{V}} + \mathbf{I}_t \Big|\Big|^{2}_{L_2} + |\varphi(\cdot)|_{L_1}.
+\end{equation*}
+
+\color{red} NOTE: $\varphi(\cdot)$ acts like a regulariser? If we have this in the L1 sense then this should promote sparsity right? Would this be better to be in the L2 sense, but we hope noise will be small so in the L2 sense it won't be effective at influencing the optimisation.\color{gray}
+
+What if we unroll a proximal gradient descent for solving this least squares problem? Proximal gradient descent is used since I'm not convinced in reality we will have an everywhere differentiable function i.e. ($f \notin C_{1}(\Omega)$). Also consider the operator, $\prox_{\varphi}(\star) \triangleq \argmin_{z} ||\star^{(i-1)} - z||^{2}_{L_2} + |\varphi(\cdot)|_{L_1}$. Update rules are;
+
+\begin{align*}
+    z^{(i)} &\leftarrow \prox_\varphi (\vec{V}^{(i-1)}) \\
+    \Rightarrow z^{(i)} &\leftarrow \argmin_{z} ||\vec{V}^{(i-1)} - z||^{2}_{L_2} + |\varphi(\cdot)|_{L_1}\\
+    \vec{V}^{(i-1)} &\leftarrow z^{(i)} + \eta^{(i)} \nabla \mathbf{I}^{T} (\mathbf{I}_t - \nabla \mathbf{I} z^{(i)}).
+\end{align*}
+
+\color{red} NOTE: we have a dynamic learning rate (stepsize), $\eta_i$. This can be learned at each step for an unrolled network. \color{gray}
+
+The trick that we need to solve now is how do we find $\argmin_{z} ||\vec{V}_{i-1} - z||^{2}_{L_2}$ efficiently? Is this where I could use a neural network to approximate?
+
+A traditional loss function for optical flow could be described by the end point error (EPE).
+
+\begin{equation*}
+\ell = \frac{1}{n} \sum_{i=1}^{n} \big|V_{i} - \hat{V}_{i} \big|_{L^2}
+\end{equation*}
+
+And the physics informed variant used to train our unrolled network is;
+
+\begin{equation*}
+\ell = \frac{1}{n} \sum_{i=1}^{n} \big|V_{i} - \hat{V}_{i} \big|^2_{L_2} + \frac{1}{N} \sum_{i=1}^{N} \big|\nabla I \cdot \hat{V}_{i} + I_t \big|^2_{L^2}
+\end{equation*}
+
+\color{red}
+NOTE: removal of the EPE metric component of the loss function, and sole reliance on the physics loss could be used to train the model, and could be used to form a \textit{self-supervised} approach to learning. However, this might not be recommended due to the aperture problem, where some data might be required to ensure that the flow is coherent.
+\color{gray}
+
+\color{black}

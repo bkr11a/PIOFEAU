@@ -1,0 +1,1 @@
+kill $(ps -e | grep 'tensorboard' | awk '{print $1}')

@@ -1,0 +1,1 @@
+tensorboard --logdir ./assets/logs --port=8074
