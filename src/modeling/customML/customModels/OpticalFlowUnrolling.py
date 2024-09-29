@@ -20,15 +20,15 @@ class UnrolledOFModel(tf.keras.Model):
         # self.data_term_layers = [dtl(alpha=self.alphas[i], name = f"DataTermLayer_{i+1}") for i in range(self.num_iterations)]
         # self.regularisation_term_layers = [rtl(alpha=self.alphas[i], name = f"RegularisationTermLayer_{i+1}") for i in range(self.num_iterations)]
         self.featureExtractionLayers = [
-            tf.keras.layers.Conv2D(2, kernel_size = 3, padding='same', activation = tf.keras.layers.LeakyReLU(negative_slope = 0.1)),
+            # tf.keras.layers.Conv2D(2, kernel_size = 3, padding='same', activation = tf.keras.layers.LeakyReLU(negative_slope = 0.1)),
             tf.keras.layers.Conv2D(32, kernel_size = 3, padding='same', activation = tf.keras.layers.LeakyReLU(negative_slope = 0.1)),
-            tf.keras.layers.Conv2D(64, kernel_size = 3, padding='same', activation = tf.keras.layers.LeakyReLU(negative_slope = 0.1)),
+            # tf.keras.layers.Conv2D(64, kernel_size = 3, padding='same', activation = tf.keras.layers.LeakyReLU(negative_slope = 0.1)),
         ]
         self.costVolumeLayer = correlationLayer(maxDisplacement = self.correlationMaxDisplacement)
         self.pyramid = pyramidLayer(numberOfPyramids=numPyramidLevels, scale=0.5, name = "ImagePyramidLayer")
         self.flowRefinementLayers = [
             tf.keras.layers.Conv2D(32, kernel_size = 3, padding='same', activation = tf.keras.layers.LeakyReLU(negative_slope = 0.1)),
-            tf.keras.layers.Conv2D(2, kernel_size = 3, padding='same', activation = tf.keras.layers.LeakyReLU(negative_slope = 0.1))
+            # tf.keras.layers.Conv2D(2, kernel_size = 3, padding='same', activation = tf.keras.layers.LeakyReLU(negative_slope = 0.1))
         ]
         self.upsample = tf.keras.layers.UpSampling2D(size = (2, 2), interpolation = 'bilinear')
         self.flowPrediction = tf.keras.layers.Conv2D(2, kernel_size = 3, padding = 'same', activation = tf.keras.layers.LeakyReLU(negative_slope = 0.1))
